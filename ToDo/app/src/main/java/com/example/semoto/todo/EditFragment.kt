@@ -1,7 +1,6 @@
 package com.example.semoto.todo
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
@@ -18,7 +17,7 @@ import kotlinx.android.synthetic.main.fragment_edit.*
  *
  */
 class EditFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+
     private var title = ""
     private var deadline = ""
     private var taskDetail = ""
@@ -32,7 +31,7 @@ class EditFragment : Fragment() {
         if (context is OnFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnFragmentInteractionListener")
         }
     }
 
@@ -85,6 +84,10 @@ class EditFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         updateUi(mode)
+
+        imageButtonDateSet.setOnClickListener {
+            listener?.onDatePickerLaunched()
+        }
     }
 
     private fun updateUi(mode: ModeInEdit) {
@@ -98,33 +101,15 @@ class EditFragment : Fragment() {
             }
         }
     }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
-
-
-
+    
     override fun onDetach() {
         super.onDetach()
         listener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+
+        fun onDatePickerLaunched()
     }
 
     companion object {
