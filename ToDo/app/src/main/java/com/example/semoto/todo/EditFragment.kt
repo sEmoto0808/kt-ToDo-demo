@@ -1,10 +1,14 @@
 package com.example.semoto.todo
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
+import io.realm.Realm
 import kotlinx.android.synthetic.main.fragment_edit.*
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 
 /**
@@ -74,8 +78,74 @@ class EditFragment : Fragment() {
      * */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         // TODO DBへの登録処理
+        if (item!!.itemId == R.id.menu_register) recordToRealmDB(mode)
         return super.onOptionsItemSelected(item)
     }
+
+    private fun recordToRealmDB(mode: ModeInEdit) {
+        
+        val isRequiredItemFills = isRequiredItemFilledCheck()
+        if (!isRequiredItemFills) return
+
+        when (mode) {
+            ModeInEdit.NEW_ENTRY -> addNewTodo()
+            ModeInEdit.EDIT -> editExistingTodo()
+        }
+
+        listener?.onDataEdited()
+        fragmentManager?.let {
+            it.beginTransaction().remove(this).commit()
+        }
+    }
+
+    private fun isRequiredItemFilledCheck(): Boolean {
+
+        if (inputTitleText.text.toString() == "") {
+            inputTitle.error = getString(R.string.error)
+            return false
+        }
+
+        if (!inputDateCheck(inputDateText.text.toString())) {
+            inputDate.error = getString(R.string.error)
+            return false
+        }
+
+        return true
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun inputDateCheck(inputDate: String): Boolean {
+        if (inputDate == "") return false
+
+        try {
+            val format = SimpleDateFormat("yyyy/MM/dd")
+            format.isLenient = false
+            format.parse(inputDate)
+        } catch (e: ParseException) {
+            return false
+        }
+        return true
+    }
+
+    private fun addNewTodo() {
+
+        val realm = Realm.getDefaultInstance()
+        realm.beginTransaction()
+        val newTodo = realm.createObject(TodoModel::class.java)
+        newTodo.apply {
+            title = inputTitleText.text.toString()
+            deadline = inputDateText.text.toString()
+            taskDetail = inputDetailText.text.toString()
+            isCompleted = checkBox.isChecked
+        }
+        realm.commitTransaction()
+        realm.close()
+    }
+
+    private fun editExistingTodo() {
+
+    }
+
 
     /**
      * Viewの更新はonActivityCreatedでやる方が安全
@@ -101,7 +171,7 @@ class EditFragment : Fragment() {
             }
         }
     }
-    
+
     override fun onDetach() {
         super.onDetach()
         listener = null
@@ -110,6 +180,7 @@ class EditFragment : Fragment() {
     interface OnFragmentInteractionListener {
 
         fun onDatePickerLaunched()
+        fun onDataEdited()
     }
 
     companion object {

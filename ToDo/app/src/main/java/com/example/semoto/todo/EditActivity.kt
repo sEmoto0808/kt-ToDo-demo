@@ -8,7 +8,6 @@ import kotlinx.android.synthetic.main.activity_edit.*
 
 class EditActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionListener, DatePickerDialogFragment.OnDateSetListener {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
@@ -56,6 +55,10 @@ class EditActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
      * */
     override fun onDatePickerLaunched() {
         DatePickerDialogFragment().show(supportFragmentManager, FragmentTag.DATE_PICKER.toString())
+    }
+
+    override fun onDataEdited() {
+        finish()
     }
 
     /**

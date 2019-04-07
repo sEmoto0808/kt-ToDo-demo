@@ -95,6 +95,10 @@ class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
         DatePickerDialogFragment().show(supportFragmentManager, FragmentTag.DATE_PICKER.toString())
     }
 
+    override fun onDataEdited() {
+        // TODO リストの更新処理
+    }
+
     /**
      * DatePickerDialogFragment.OnDateSetListener
      * */

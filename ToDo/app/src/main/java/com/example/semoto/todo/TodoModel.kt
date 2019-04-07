@@ -9,7 +9,7 @@ open class TodoModel: RealmObject() {
     // 期日(yyyy/mm/dd)
     var deadline = ""
     // タスク内容
-    var taskDetal = ""
+    var taskDetail = ""
     // タスク完了フラグ
     var isCompleted = false
 }
