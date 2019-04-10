@@ -77,7 +77,7 @@ class EditFragment : Fragment() {
      * メニューのクリック処理
      * */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        // TODO DBへの登録処理
+
         if (item!!.itemId == R.id.menu_register) recordToRealmDB(mode)
         return super.onOptionsItemSelected(item)
     }

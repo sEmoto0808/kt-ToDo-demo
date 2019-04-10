@@ -6,9 +6,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 
 import com.example.semoto.todo.dummy.DummyContent
 import com.example.semoto.todo.dummy.DummyContent.DummyItem
@@ -36,6 +34,7 @@ class MasterFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_master_list, container, false)
+        setHasOptionsMenu(true)
 
         // Set the adapter
         if (view is RecyclerView) {
@@ -48,6 +47,26 @@ class MasterFragment : Fragment() {
             }
         }
         return view
+    }
+
+    /**
+     * メニューアイテムを設定
+     * */
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        // 各アイテムの表示・非表示
+        menu!!.apply {
+            findItem(R.id.menu_delete).isVisible = false
+            findItem(R.id.menu_edit).isVisible = false
+            findItem(R.id.menu_register).isVisible = false
+            findItem(R.id.action_settings).isVisible = true
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item!!.itemId == R.id.action_settings) makeToast(activity!!, "")
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onAttach(context: Context) {

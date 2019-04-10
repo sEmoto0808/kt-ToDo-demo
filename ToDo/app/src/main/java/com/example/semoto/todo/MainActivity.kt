@@ -21,12 +21,25 @@ class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        supportFragmentManager
+                .beginTransaction()
+                .add(R.id.container_master,
+                        MasterFragment.newInstance(1),
+                        FragmentTag.MASTER.toString())
+                .commit()
+
         fab.setOnClickListener { view ->
             goEditScreen("", "", "", false, ModeInEdit.NEW_ENTRY)
         }
 
         // スマホorタブレットの判定
         isTwoPane = container_detail != null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // スマホの場合
+        updateTodoList()
     }
 
     private fun goEditScreen(title: String,
@@ -96,7 +109,18 @@ class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
     }
 
     override fun onDataEdited() {
-        // TODO リストの更新処理
+        // タブレットの場合
+        updateTodoList()
+    }
+
+    private fun updateTodoList() {
+
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.container_master,
+                        MasterFragment.newInstance(1),
+                        FragmentTag.MASTER.toString())
+                .commit()
     }
 
     /**
