@@ -44,7 +44,7 @@ class EditFragment : Fragment() {
         arguments?.let {
             title = it.getString(IntentKey.TITLE.name)
             deadline = it.getString(IntentKey.DEADLINE.name)
-            taskDetail = it.getString(IntentKey.TITLE.name)
+            taskDetail = it.getString(IntentKey.TASK_DETAIL.name)
             isCompleted = it.getBoolean(IntentKey.IS_COMPLETED.name)
             mode = it.getSerializable(IntentKey.MODE_IN_EDIT.name) as ModeInEdit
         }

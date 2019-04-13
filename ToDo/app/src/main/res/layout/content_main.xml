@@ -10,7 +10,7 @@
     tools:showIn="@layout/activity_main">
 
     <FrameLayout
-        android:id="@+id/comtainer_master"
+        android:id="@+id/container_master"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
