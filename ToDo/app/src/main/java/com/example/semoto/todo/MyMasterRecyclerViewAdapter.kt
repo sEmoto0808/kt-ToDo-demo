@@ -45,8 +45,8 @@ class MyMasterRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.textViewTitle.text = MyApplication.appContext.getString(R.string.deadline) + " : " + item?.title
-        holder.textViewDeadline.text = item?.deadline
+        holder.textViewTitle.text = item?.title
+        holder.textViewDeadline.text = MyApplication.appContext.getString(R.string.deadline) + " : " + item?.deadline
 
         val changedDeadline = SimpleDateFormat("yyyy/MM/dd").parse(item?.deadline)
         val now = Date()
