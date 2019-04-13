@@ -7,7 +7,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import com.example.semoto.todo.dummy.DummyContent.DummyItem
 import io.realm.Realm
 
 /**
@@ -101,8 +100,7 @@ class MasterFragment : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: DummyItem?)
+        fun onListItemClicked(item: TodoModel)
     }
 
     companion object {

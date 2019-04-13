@@ -1,12 +1,12 @@
 package com.example.semoto.todo
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import io.realm.Realm
+import kotlinx.android.synthetic.main.fragment_detail.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -24,28 +24,87 @@ private const val ARG_PARAM2 = "param2"
  *
  */
 class DetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private var title = ""
+    private var deadline = ""
+    private var taskDetail = ""
+    private var isCompleted = false
+
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            title = it.getString(IntentKey.TITLE.name)
+            deadline = it.getString(IntentKey.DEADLINE.name)
+            taskDetail = it.getString(IntentKey.TITLE.name)
+            isCompleted = it.getBoolean(IntentKey.IS_COMPLETED.name)
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+        val view = inflater.inflate(R.layout.fragment_detail, container, false)
+        // onCreateOptionMenuを受け取る
+        setHasOptionsMenu(true)
+        return view
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        title_detail.text = title
+        deadline_detail.text = deadline
+        todo_detail.text = taskDetail
+    }
+
+    /**
+     * メニューアイテムを設定
+     * */
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+        // 各アイテムの表示・非表示
+        menu!!.apply {
+            findItem(R.id.menu_delete).isVisible = true
+            findItem(R.id.menu_edit).isVisible = true
+            findItem(R.id.menu_register).isVisible = false
+        }
+    }
+
+    /**
+     * メニューのクリック処理
+     * */
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+
+        when (item?.itemId) {
+            R.id.menu_delete -> {
+                deleteSelectedTodo(title, deadline, taskDetail)
+            }
+            R.id.menu_edit -> {
+                listener?.onEditSelectedTodo(title, deadline, taskDetail, isCompleted, ModeInEdit.EDIT)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    @SuppressLint("CommitTransaction")
+    private fun deleteSelectedTodo(title: String, deadline: String, taskDetail: String) {
+        val realm = Realm.getDefaultInstance()
+        val selectedTodo = realm.where(TodoModel::class.java)
+                .equalTo(TodoModel::title.name, title)
+                .equalTo(TodoModel::deadline.name, deadline)
+                .equalTo(TodoModel::taskDetail.name, taskDetail)
+                .findFirst()
+
+        realm.beginTransaction()
+        selectedTodo?.deleteFromRealm()
+        realm.commitTransaction()
+
+        listener?.onDetaDeleted()
+        fragmentManager?.beginTransaction()?.remove(this)?.commit()
+
+        realm.close()
     }
 
     override fun onAttach(context: Context) {
@@ -74,8 +133,8 @@ class DetailFragment : Fragment() {
      * for more information.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+        fun onDetaDeleted()
+        fun onEditSelectedTodo(title: String, deadline: String, taskDetail: String, isCompleted: Boolean, mode: ModeInEdit)
     }
 
     companion object {
@@ -87,13 +146,17 @@ class DetailFragment : Fragment() {
          * @param param2 Parameter 2.
          * @return A new instance of fragment DetailFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(title: String,
+                        deadline: String,
+                        taskDetail: String,
+                        isCompleted: Boolean) =
                 DetailFragment().apply {
                     arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
+                        putString(IntentKey.TITLE.name, title)
+                        putString(IntentKey.DEADLINE.name, deadline)
+                        putString(IntentKey.TASK_DETAIL.name, taskDetail)
+                        putBoolean(IntentKey.IS_COMPLETED.name, isCompleted)
                     }
                 }
     }

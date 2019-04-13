@@ -12,7 +12,11 @@ import kotlinx.android.synthetic.main.content_main.*
 /**
  * Basic Activity
  * */
-class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionListener, DatePickerDialogFragment.OnDateSetListener {
+class MainActivity : AppCompatActivity(),
+        EditFragment.OnFragmentInteractionListener,
+        DatePickerDialogFragment.OnDateSetListener,
+        MasterFragment.OnListFragmentInteractionListener,
+        DetailFragment.OnFragmentInteractionListener {
 
     var isTwoPane = false
 
@@ -54,12 +58,23 @@ class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
 //            val fragmentTransaction = fragmentManager.beginTransaction()
 //            fragmentTransaction.add(R.id.container_detail, EditFragment.newInstance("1","1"))
 //            fragmentTransaction.commit()
-            supportFragmentManager
-                    .beginTransaction()
-                    .add(R.id.container_detail,
-                            EditFragment.newInstance(title,deadline, taskDetail, isCompleted, mode),
-                            FragmentTag.EDIT.toString())
-                    .commit()
+            if (supportFragmentManager.findFragmentByTag(FragmentTag.EDIT.toString()) == null &&
+                    supportFragmentManager.findFragmentByTag(FragmentTag.EDIT.toString()) == null) {
+                supportFragmentManager
+                        .beginTransaction()
+                        .add(R.id.container_detail,
+                                EditFragment.newInstance(title, deadline, taskDetail, isCompleted, mode),
+                                FragmentTag.EDIT.toString())
+                        .commit()
+            } else {
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.container_detail,
+                                EditFragment.newInstance(title, deadline, taskDetail, isCompleted, mode),
+                                FragmentTag.EDIT.toString())
+                        .commit()
+            }
+
             return
         }
 
@@ -129,5 +144,56 @@ class MainActivity : AppCompatActivity(), EditFragment.OnFragmentInteractionList
     override fun onDateSelected(dateString: String) {
         val inputDateText = findViewById<EditText>(R.id.inputDateText)
         inputDateText.setText(dateString)
+    }
+
+    /**
+     * MasterFragment.OnListFragmentInteractionListener
+     * */
+    override fun onListItemClicked(item: TodoModel) {
+        goDetailScreen(item.title, item.deadline, item.taskDetail, false)
+    }
+
+    private fun goDetailScreen(title: String, deadline: String, taskDetail: String, isCompleted: Boolean) {
+        if (isTwoPane) {
+            // タブレットの場合
+            if (supportFragmentManager.findFragmentByTag(FragmentTag.EDIT.toString()) == null &&
+                    supportFragmentManager.findFragmentByTag(FragmentTag.EDIT.toString()) == null) {
+                supportFragmentManager
+                        .beginTransaction()
+                        .add(R.id.container_detail,
+                                DetailFragment.newInstance(title, deadline, taskDetail, isCompleted),
+                                FragmentTag.DETAIL.toString())
+                        .commit()
+            } else {
+                supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.container_detail,
+                                DetailFragment.newInstance(title, deadline, taskDetail, isCompleted),
+                                FragmentTag.DETAIL.toString())
+                        .commit()
+            }
+            return
+        }
+
+        // スマホの場合
+        val intent = Intent(this@MainActivity, DetailActivity::class.java).apply {
+            putExtra(IntentKey.TITLE.name, title)
+            putExtra(IntentKey.DEADLINE.name, deadline)
+            putExtra(IntentKey.TASK_DETAIL.name, taskDetail)
+            putExtra(IntentKey.IS_COMPLETED.name, isCompleted)
+        }
+        startActivity(intent)
+
+    }
+
+    /**
+     * DetailFragment.OnFragmentInteractionListener
+     * */
+    override fun onDetaDeleted() {
+        updateTodoList()
+    }
+
+    override fun onEditSelectedTodo(title: String, deadline: String, taskDetail: String, isCompleted: Boolean, mode: ModeInEdit) {
+        goEditScreen(title, deadline, taskDetail, isCompleted, mode)
     }
 }
