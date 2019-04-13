@@ -1,6 +1,7 @@
 package com.example.semoto.todo
 
 import android.app.Application
+import android.content.Context
 import io.realm.Realm
 
 class MyApplication: Application() {
@@ -9,5 +10,10 @@ class MyApplication: Application() {
         super.onCreate()
 
         Realm.init(this)
+        appContext = this
+    }
+
+    companion object {
+        lateinit var appContext: Context
     }
 }

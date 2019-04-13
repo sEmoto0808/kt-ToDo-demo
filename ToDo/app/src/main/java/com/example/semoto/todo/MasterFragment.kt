@@ -7,9 +7,8 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-
-import com.example.semoto.todo.dummy.DummyContent
 import com.example.semoto.todo.dummy.DummyContent.DummyItem
+import io.realm.Realm
 
 /**
  * A fragment representing a list of Items.
@@ -43,7 +42,14 @@ class MasterFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyMasterRecyclerViewAdapter(DummyContent.ITEMS, listener)
+
+                val realm = Realm.getDefaultInstance()
+                val results = realm.where(TodoModel::class.java)
+                        .equalTo(TodoModel::isCompleted.name, false)
+                        .sort(TodoModel::deadline.name)
+                        .findAll()
+
+                adapter = MyMasterRecyclerViewAdapter(results, listener)
             }
         }
         return view

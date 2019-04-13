@@ -4,13 +4,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 
 
 import com.example.semoto.todo.MasterFragment.OnListFragmentInteractionListener
 import com.example.semoto.todo.dummy.DummyContent.DummyItem
+import io.realm.RealmResults
 
 import kotlinx.android.synthetic.main.fragment_master.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
@@ -18,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_master.view.*
  * TODO: Replace the implementation with code for your data type.
  */
 class MyMasterRecyclerViewAdapter(
-        private val mValues: List<DummyItem>,
+        private val mValues: RealmResults<TodoModel>,
         private val mListener: OnListFragmentInteractionListener?)
     : RecyclerView.Adapter<MyMasterRecyclerViewAdapter.ViewHolder>() {
 
@@ -41,8 +45,17 @@ class MyMasterRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mIdView.text = item.id
-        holder.mContentView.text = item.content
+        holder.textViewTitle.text = MyApplication.appContext.getString(R.string.deadline) + " : " + item?.title
+        holder.textViewDeadline.text = item?.deadline
+
+        val changedDeadline = SimpleDateFormat("yyyy/MM/dd").parse(item?.deadline)
+        val now = Date()
+
+        if (now >= changedDeadline) {
+            holder.imageStatus.setImageResource(R.drawable.ic_warning_black_24dp)
+        } else {
+            holder.imageStatus.setImageResource(R.drawable.ic_work_black_24dp)
+        }
 
         with(holder.mView) {
             tag = item
@@ -53,11 +66,8 @@ class MyMasterRecyclerViewAdapter(
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mIdView: TextView = mView.item_number
-        val mContentView: TextView = mView.content
-
-        override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
-        }
+        val textViewTitle: TextView = mView.textViewTitle
+        val textViewDeadline: TextView = mView.textViewDeadline
+        val imageStatus: ImageView = mView.imageStatus
     }
 }
